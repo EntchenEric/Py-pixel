@@ -288,8 +288,6 @@ class Player():
         return challenges
 
 
-
-
 class Stats():
 
     def __init__(self, data):
@@ -1693,3 +1691,168 @@ class ChallengeReward():
     def amount(self):
         amount = self.challengeRewardData["amount"]
         return amount
+
+class SkyblockPlayer():
+
+    def __init__(self, uuid):
+        self.UUID = uuid
+        skyblockData = requests.get(f"https://api.hypixel.net/skyblock/profiles?key={chooseapikey()}&uuid={uuid}").json()["profiles"]
+
+        profiles = []
+        for profile in skyblockData["profiles"]:
+            prof = SkyblockProfile(profile)
+            profiles.append(prof)
+
+        skyblockData["profiles"] = profiles
+
+        self.skyblockData = skyblockData
+
+
+    @property
+    def profileid(self):
+        profileid = self.data["profileid"]
+        return profileid
+
+class SkyblockProfile():
+    
+    def __init__(self, data):
+        self.data = data
+
+    @property
+    def profileid(self):
+        profileid = self.data["profileid"]
+        return profileid
+
+    @property
+    def cute_name(self):
+        cute_name = self.data["cute_name"]
+        return cute_name
+
+    @property
+    def game_mode(self):
+        try:
+            game_mode = self.data["cute_name"]
+        except:
+            game_mode = "normal"
+        return game_mode
+
+    @property
+    def transactions(self):
+        try:
+            transactions = self.data["banking"]["transactions"]
+        except:
+            transactions = []
+        return transactions
+
+    @property
+    def balance(self):
+        try:
+            balance = self.data["banking"]["balance"]
+        except:
+            balance = 0
+        return balance
+
+    @property
+    def upgrades(self):
+        upgrades = []
+        for upgrade in self.data["community_upgrades"]["upgrade_states"]:
+            up = FinishedCommunityUpgrade(upgrade)
+            upgrades.append(up)
+        for upgrade in self.data["community_upgrades"]["currently_upgrading"]:
+            up = OnGoingCommunityUpgrade(upgrade)
+            upgrades.append(up)
+
+        return upgrades 
+
+class FinishedCommunityUpgrade():
+    def __init__(self, data):
+        self.data = data
+
+    @property
+    def upgrade(self):
+        upgrade = self.data["upgrade"]
+        return upgrade
+
+    @property
+    def tier(self):
+        tier = self.data["tier"]
+        return tier
+
+    @property
+    def started_ms(self):
+        started_ms = self.data["started_ms"]
+        return started_ms
+
+    @property
+    def started_by(self):
+        started_by = self.data["started_by"]
+        started_by = SkyblockPlayer(started_by)
+        return started_by
+
+    @property
+    def claimed_ms(self):
+        claimed_ms = self.data["claimed_ms"]
+        return claimed_ms
+
+    @property
+    def claimed_by(self):
+        claimed_by = self.data["claimed_by"]
+        claimed_by = SkyblockPlayer(claimed_by)
+        return claimed_by
+
+    @property
+    def skipped(self):
+        skipped = self.data["fasttracked"]
+        return skipped
+
+class OnGoingCommunityUpgrade():
+    
+    def __init__(self, data):
+        self.data = data
+
+    @property
+    def upgrade(self):
+        upgrade = self.data["upgrade"]
+        return upgrade
+
+    @property
+    def new_tier(self):
+        new_tier = self.data["new_tier"]
+        return new_tier
+
+    @property
+    def start_ms(self):
+        start_ms = self.data["start_ms"]
+        return start_ms
+
+    @property
+    def who_started(self):
+        who_started = self.data["who_started"]
+        who_started = SkyblockPlayer(who_started)
+        return who_started
+
+class Collection():
+    
+    def __init__(self, data):
+        self.data = data
+    
+    @property
+    def name(self):
+        name = self.data["name"]
+        return name
+    
+    @property
+    def maxTiers(self):
+        maxTiers = self.data["maxTiers"]
+        return maxTiers
+    
+    @property
+    def tiers(self):
+        tiers = self.data["tiers"]
+        return tiers
+        
+
+
+class CollectionTier():
+    def __init__(self, data):
+        self.data = data
